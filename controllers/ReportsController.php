@@ -69,27 +69,37 @@ class ReportsController extends Controller
 
         $esito_create = $model->load($post_data) && $model->save();
 
-        if ($esito_create) {
+        if ($esito_create)
+        {
           foreach($post_data as $post_input => $value)
-            if (preg_match('/allergen_(\d)+_id/', $post_input) == 1) {
+          {
+            if (preg_match('/allergen_(\d)+_id/', $post_input) == 1)
+            {
               $allergen_index = str_replace('allergen_', '', str_replace('_id', '', $post_input));
               $allergen_id = $post_data[$post_input];
               $allergen_value = $post_data['allergen_'.$allergen_index.'_value'];
 
-              if($allergen_id != -1) {
+              if($allergen_id != -1)
+              {
                 $check_allergen = Yii::$app->getDb()->createCommand("SELECT * FROM rows WHERE allergen_id = ". $allergen_id ." AND report_id = ". $model->id)->queryAll();
 
-                if (count($check_allergen) == 0) {
+                if (count($check_allergen) == 0)
+                {
                   $result = Yii::$app->getDb()->createCommand("INSERT INTO rows VALUES (". $allergen_id .", ". $model->id .", ". ($allergen_value ? floatval($allergen_value) : '') .")")->execute();
 
                   if($result == 0)
+                  {
                     return $this->redirect(['update', 'id' => $model->id]);
+                  }
                 }
               }
             }
+          }
 
-            return $this->redirect(['view', 'id' => $model->id]);
-        } else {
+          return $this->redirect(['view', 'id' => $model->id]);
+        }
+        else
+        {
             return $this->render('create', [
                 'model' => $model,
             ]);
